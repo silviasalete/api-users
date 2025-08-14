@@ -1,4 +1,4 @@
-package com.programatriz.users.infra.cache.security;
+package com.programatriz.users.infra.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
