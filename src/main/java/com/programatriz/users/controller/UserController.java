@@ -18,6 +18,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
 @RequestMapping("/users")
 @Slf4j
@@ -47,6 +50,7 @@ public class UserController {
         }
 
         User userCreated = service.create(dto);
+        userCreated.add(linkTo(methodOn(UserController.class).listAll()).withSelfRel());
 
         headers.set("message","USER CREATED");
         return new ResponseEntity<>(userCreated,headers,HttpStatus.OK);

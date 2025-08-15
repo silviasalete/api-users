@@ -3,6 +3,7 @@ package com.programatriz.users.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,7 +15,7 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 @AllArgsConstructor
-public class User implements UserDetails, Serializable {
+public class User extends RepresentationModel<User> implements UserDetails, Serializable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
