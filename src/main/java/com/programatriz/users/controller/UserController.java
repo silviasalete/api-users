@@ -1,11 +1,9 @@
 package com.programatriz.users.controller;
 
-import com.programatriz.users.infra.cache.UserLast;
 import com.programatriz.users.model.User;
 import com.programatriz.users.model.UserDto;
 import com.programatriz.users.service.UserService;
 import com.programatriz.users.model.UserRole;
-import com.programatriz.users.service.UserServiceProxy;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -28,8 +26,6 @@ public class UserController {
 
     @Autowired
     private UserService service;
-    @Autowired
-    private UserLast userLast;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
@@ -57,8 +53,7 @@ public class UserController {
     }
 
     private String isValid(UserDto dto) {
-        var serviceProxy = new UserServiceProxy(service, userLast);
-        if (serviceProxy.findByEmail(dto.email()) != null){
+        if (service.findByEmail(dto.email()) != null){
             LOGGER.info("USER {} ALREADY EXIST",dto.email());
             return "USER ALREADY EXIST";
         };
