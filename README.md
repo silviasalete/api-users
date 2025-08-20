@@ -7,25 +7,40 @@ This is a API Restfull to keep users
 * Dependency manager: Maven
 
 ---
-## Features
-* Create new user
-* List users 
+## Requirements
+* Data bases Postgres Up
+* RabbitMQ Up
+* Redis Up
 ---
-## Data
-### Spring Data
-This project uses Spring Data JPA for data access
-### Databases
+## Features
+* Valid new user
+* Create new user
+* List users
+---
+## Spring Boot
+* Spring Data JPA
+* Spring Data Redis
+* Spring Security
+* Spring AMQP
+* Spring HATEOAS
+ 
+---
+## Databases
 * Redis: This project uses Redis as NoSQL database for application cache
 * Postgresql: This project uses Postgresql as SQL database for storage data
----
-## Security
-### Spring Security
-This project uses Spring Security to filter request HTTP and ensure application data security
 
 ---
 ## Best Practices
-### Hateoas
-This project uses the Hateoas REST architecture principle, which allows the API to be descriptive and provide links in its request.
+* API RESTful
+
+SOLID Principles
+* Single Responsibility
+* Open/Closed
+
+Design Pattern
+* Singleton
+* Builder
+* Chain of Responsibility
 
 ---
 ## Documentation
@@ -33,3 +48,4 @@ This project uses the Hateoas REST architecture principle, which allows the API 
 The documentatin this project is keepping by Swagger
 - [localhost](http://localhost:8080/swagger-ui/index.html#/)  
 ---
+ 

@@ -1,9 +1,11 @@
-package com.programatriz.users.controller;
+package com.programatriz.users.api;
 
+import com.programatriz.users.api.handles.validator.*;
+import com.programatriz.users.message.Producer;
 import com.programatriz.users.model.User;
+import com.programatriz.users.model.UserBuilder;
 import com.programatriz.users.model.UserDto;
 import com.programatriz.users.service.UserService;
-import com.programatriz.users.model.UserRole;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -19,13 +21,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
 @Tag(name = "User")
 public class UserController {
+
+    @Autowired
+    private Producer producer;
 
     @Autowired
     private UserService service;
@@ -41,35 +45,27 @@ public class UserController {
     @PostMapping
     public ResponseEntity<User> create(@RequestBody @Valid UserDto dto){
 
-        HttpHeaders headers = new HttpHeaders();
-        String validUser = isValid(dto);
+        var headers = new HttpHeaders();
+        var context = new Context(dto, UserBuilder.builder().email(dto.email()).name(dto.name()).build());
+        var userAlreadyExist = new UserAlreadyExist(service);
+        userAlreadyExist
+                .setNext(new RoleIsValid())
+                .setNext(new SetUserRole())
+                .setNext(new CriptPassword())
+                .setNext(new CreateUser(service))
+                .setNext(new SendToQueue(producer))
+                .setNext(new AddLinkToSelf());
 
-        if (!validUser.isEmpty()) {
-            headers.set("message",validUser);
-            return new ResponseEntity<>(headers,HttpStatus.BAD_REQUEST);
+        User userCreated = userAlreadyExist.treat(context);
+
+        if (userCreated != null){
+            headers.set("message","USER CREATED");
+            return new ResponseEntity<>(userCreated,headers,HttpStatus.OK);
         }
-
-        User userCreated = service.create(dto);
-        userCreated.add(linkTo(methodOn(UserController.class).listAll()).withSelfRel());
-
-        headers.set("message","USER CREATED");
-        return new ResponseEntity<>(userCreated,headers,HttpStatus.OK);
+        headers.set("message","USER NOT CREATED");
+        return new ResponseEntity<>(headers,HttpStatus.BAD_REQUEST);
     }
 
-    private String isValid(UserDto dto) {
-        if (service.findByEmail(dto.email()) != null){
-            LOGGER.info("USER {} ALREADY EXIST",dto.email());
-            return "USER ALREADY EXIST";
-        };
-
-        try {
-            UserRole.valueOf(dto.role());
-            return "";
-        }catch (IllegalArgumentException e){
-            LOGGER.info("INVALID ROLE {}",dto.role());
-            return "INVALID ROLE USE {}";
-        }
-    }
 
     @Operation(summary = "List users", description = "List all users")
     @GetMapping

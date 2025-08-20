@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name = "users")
+@Table(name = "tb-users")
 @AllArgsConstructor
 public class User extends RepresentationModel<User> implements UserDetails, Serializable{
 
@@ -25,15 +25,15 @@ public class User extends RepresentationModel<User> implements UserDetails, Seri
     private String password;
     private UserRole role;
 
-    public User() {
+    protected User() {
     }
 
-    public User(String name, String email, String encryptedPassword, UserRole userRole) {
-        this.name = name;
-        this.email = email;
-        this.password = encryptedPassword;
-        this.role = userRole;
-    }
+//    public User(String name, String email, String password, UserRole userRole) {
+//        this.name = name;
+//        this.email = email;
+//        this.password = password;
+//        this.role = userRole;
+//    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -109,4 +109,5 @@ public class User extends RepresentationModel<User> implements UserDetails, Seri
     public void setRole(UserRole role) {
         this.role = role;
     }
+
 }

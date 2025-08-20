@@ -1,5 +1,8 @@
 package com.programatriz.users.model;
 
-public record UserDto(String name, String email, String password, String role){
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
+public record UserDto(@NotBlank String name,@NotBlank  @Email String email, @NotBlank String password, String role){
 
 }

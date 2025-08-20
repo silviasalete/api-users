@@ -1,19 +1,14 @@
 package com.programatriz.users.service;
 
-import com.programatriz.users.repository.UserRepository;
 import com.programatriz.users.model.User;
-import com.programatriz.users.model.UserDto;
-import com.programatriz.users.model.UserRole;
+import com.programatriz.users.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
 
 @Service
-@EnableCaching
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -24,21 +19,26 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public User create(UserDto dto ){
-        String encryptedPassword = new BCryptPasswordEncoder().encode(dto.password());
-        var user = new User(dto.name(), dto.email(), encryptedPassword,UserRole.valueOf(dto.role()));
+    public User create(User user){
         return repository.save(user);
     }
 
-    @Cacheable("users")
     @Override
+//    @Cacheable("users") TODO it doesn't working
     public User findByEmail(String email) {
-        LOGGER.info("LOOKING FOR {} IN DATABASE",email);
-        return repository.findByEmail(email);
+        LOGGER.info("Looking for {} in database...",email);
+        try {
+            return repository.findByEmail(email);
+        } catch (IncorrectResultSizeDataAccessException e){
+            LOGGER.error("ERROR: Exist duplicate data: {} Message error {}",email,e.getMessage());
+            var listUser = repository.findAll();
+            return listUser.iterator().next();
+        }
     }
 
     @Override
     public Iterable<User> listAll() {
         return repository.findAll();
     }
+
 }

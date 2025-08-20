@@ -1,6 +1,6 @@
 spring:
   application:
-    name: api-users
+    name: api-usersdocker
   datasource:
     url: ${DB_URL}
     username: ${DB_USER_NAME}
@@ -15,3 +15,15 @@ spring:
         show_sql: true
   cache:
     type: redis
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: ${RABBITMQ_PASSWORD}
+msg:
+  queue:
+    name: new.users
+  exchange:
+    name: api.user
+  routingKey:
+    name: new.users.routingkey
