@@ -45,7 +45,7 @@ public class UserController {
 
         var headers = new HttpHeaders();
         var facade = new Facade(dto, service, producer);
-        User userCreated = facade.validAndTreatUser();
+        User userCreated = facade.crateUser();
 
         if (userCreated != null){
             headers.set("message","USER CREATED");

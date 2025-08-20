@@ -19,7 +19,7 @@ public class Facade {
         this.producer = producer;
     }
 
-    public User validAndTreatUser(){
+    public User crateUser(){
 
         var context = new Context(dto, UserBuilder.builder().email(dto.email()).name(dto.name()).build());
         var userAlreadyExist = new UserAlreadyExist(service);
