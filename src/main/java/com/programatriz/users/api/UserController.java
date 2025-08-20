@@ -1,9 +1,8 @@
 package com.programatriz.users.api;
 
-import com.programatriz.users.api.handles.validator.*;
+import com.programatriz.users.api.handles.Facade;
 import com.programatriz.users.message.Producer;
 import com.programatriz.users.model.User;
-import com.programatriz.users.model.UserBuilder;
 import com.programatriz.users.model.UserDto;
 import com.programatriz.users.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RestController
 @RequestMapping("/users")
@@ -46,17 +44,8 @@ public class UserController {
     public ResponseEntity<User> create(@RequestBody @Valid UserDto dto){
 
         var headers = new HttpHeaders();
-        var context = new Context(dto, UserBuilder.builder().email(dto.email()).name(dto.name()).build());
-        var userAlreadyExist = new UserAlreadyExist(service);
-        userAlreadyExist
-                .setNext(new RoleIsValid())
-                .setNext(new SetUserRole())
-                .setNext(new CriptPassword())
-                .setNext(new CreateUser(service))
-                .setNext(new SendToQueue(producer))
-                .setNext(new AddLinkToSelf());
-
-        User userCreated = userAlreadyExist.treat(context);
+        var facade = new Facade(dto, service, producer);
+        User userCreated = facade.validAndTreatUser();
 
         if (userCreated != null){
             headers.set("message","USER CREATED");
