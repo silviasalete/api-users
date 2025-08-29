@@ -7,15 +7,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class CriptPassword extends Validator{
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     @Override
     public User treat(Context context) {
-        LOGGER.info("Crypting password...");
         String encryptedPassword = new BCryptPasswordEncoder().encode(context.getDto().password());
-
         context.getUser().setPassword(encryptedPassword);
-        LOGGER.info("Password cryppet...");
         return super.treat(context);
     }
 }

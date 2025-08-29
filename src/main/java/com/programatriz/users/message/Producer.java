@@ -1,7 +1,9 @@
 package com.programatriz.users.message;
 
+import com.programatriz.users.model.SendEmailQueue;
 import com.programatriz.users.model.User;
 import com.programatriz.users.model.UserDto;
+import com.programatriz.users.model.UserQueue;
 import lombok.AllArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,14 +18,21 @@ public class Producer {
         this.template = template;
     }
 
-    @Value("${msg.exchange.name}")
-    private String exchangeName;
+    @Value("${rabbitmq.exchange.email.direct}")
+    private String emailExchangeDirect;
 
-    @Value("${msg.routingKey.name}")
-    private String routingKey;
+    @Value("${rabbitmq.exchange.user.fanout}")
+    private String userExchangeFanout;
+
+    @Value("${rabbitmq.routingkey.email}")
+    private String emailRoutingkeyValidFail;
 
 
-    public void send(User user){
-        template.convertAndSend(exchangeName, routingKey, user);
+    public void sendUser(UserQueue userQueue){
+        template.convertAndSend(userExchangeFanout, userQueue);
+    }
+
+    public void sendEmailValidFail(SendEmailQueue sendEmailQueue) {
+        template.convertAndSend(emailExchangeDirect,emailRoutingkeyValidFail, sendEmailQueue);
     }
 }

@@ -4,6 +4,7 @@ import com.programatriz.users.api.handles.Facade;
 import com.programatriz.users.message.Producer;
 import com.programatriz.users.model.User;
 import com.programatriz.users.model.UserDto;
+import com.programatriz.users.service.HTTPService;
 import com.programatriz.users.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,6 +33,9 @@ public class UserController {
     @Autowired
     private UserService service;
 
+    @Autowired
+    private HTTPService httpService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     @Operation(summary = "Create user", description = "Create and returns a new user")
@@ -44,7 +48,7 @@ public class UserController {
     public ResponseEntity<User> create(@RequestBody @Valid UserDto dto){
 
         var headers = new HttpHeaders();
-        var facade = new Facade(dto, service, producer);
+        var facade = new Facade(dto, service, producer, httpService);
         User userCreated = facade.crateUser();
 
         if (userCreated != null){

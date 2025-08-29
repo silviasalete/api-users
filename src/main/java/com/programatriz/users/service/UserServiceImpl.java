@@ -26,7 +26,6 @@ public class UserServiceImpl implements UserService {
     @Override
 //    @Cacheable("users") TODO it doesn't working
     public User findByEmail(String email) {
-        LOGGER.info("Looking for {} in database...",email);
         try {
             return repository.findByEmail(email);
         } catch (IncorrectResultSizeDataAccessException e){

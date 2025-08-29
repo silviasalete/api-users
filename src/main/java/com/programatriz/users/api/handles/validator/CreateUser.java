@@ -6,7 +6,7 @@ import com.programatriz.users.service.UserService;
 public class CreateUser  extends Validator{
 
 
-    private UserService service;
+    private final UserService service;
 
     public CreateUser(UserService service) {
         this.service = service;

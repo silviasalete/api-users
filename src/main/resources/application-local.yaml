@@ -2,11 +2,21 @@ application:
   title: Api USer
   version: 0.0.1
 server:
-  port: 8080
+  port: 8082
 spring:
   application:
-    name: api-user
+    name: API USER
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER_NAME}
+    password: ${DB_PASSWORD}
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: update
     properties:
@@ -29,9 +39,12 @@ rabbitmq:
         fail: email.valid.fail
     user:
       new: new.users
+logging:
+  level:
+    root: WARN
 api:
   email:
-    url: ${API_EMAIL_URL}
+    url: http://localhost:8081/email
 resilience4j:
   circuitbreaker:
     instances:

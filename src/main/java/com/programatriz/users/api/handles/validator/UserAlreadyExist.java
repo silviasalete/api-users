@@ -18,14 +18,12 @@ public class UserAlreadyExist extends Validator {
 
     @Override
     public User treat(Context context) {
-        LOGGER.info("FLOW started ... {}",this.getClass().getSimpleName());
         User user = service.findByEmail(context.getDto().email());
-        if (user == null){
-            LOGGER.info("USER NOT EXIST");
-            return super.treat(context);
-        }else{
-            LOGGER.info("USER EXIST");
+        if (user != null) {
+            LOGGER.warn("USER ALREADY EXIST: {}",user.getName());
             return null;
-        }
+        };
+
+        return super.treat(context);
     }
 }

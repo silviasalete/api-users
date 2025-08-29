@@ -14,10 +14,9 @@ public class RoleIsValid extends Validator{
     public User treat(Context context) {
         try {
             UserRole.valueOf(context.getDto().role());
-            LOGGER.info("Role is valid! ");
             return super.treat(context);
         }catch (IllegalArgumentException e){
-            LOGGER.info("Role is invalid {}",context.getDto().role());
+            LOGGER.warn("ROLE IS INVALID {}",context.getDto().role());
             return null;
         }
     }
