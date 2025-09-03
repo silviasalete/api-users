@@ -1,24 +1,20 @@
 package com.programatriz.users.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.programatriz.users.api.handles.validator.Context;
-import com.programatriz.users.api.handles.validator.SendEmailValidation;
 import com.programatriz.users.message.Producer;
 import com.programatriz.users.model.SendEmail;
 import com.programatriz.users.model.SendEmailQueue;
-import com.programatriz.users.model.User;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.net.ConnectException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+
 
 @Service
 public class HTTPService {
@@ -28,7 +24,7 @@ public class HTTPService {
     @Value("${api.email.url}")
     private String apiEmailUrl;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SendEmailValidation.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HTTPService.class);
 
     @CircuitBreaker(name = "apiEmail", fallbackMethod = "fallbackCliente")
     public HttpResponse<String> requestAPIEmail(SendEmail sendEmail, Producer producer){
@@ -40,18 +36,21 @@ public class HTTPService {
                     .header("Content-Type", "application/json")
                     .POST(bodyRequest)
                     .build();
-            return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200){
+                LOGGER.error("[FLOW-NEW-USER] Status code is {} in {}",apiEmailUrl, response.statusCode());
+                throw new RuntimeException();
+            }
+            return response;
         } catch (Exception e) {
-            LOGGER.error("CONNECTION FAIL {} IS NOT WORKING....",apiEmailUrl);
+            LOGGER.error("[FLOW-NEW-USER] Connection with {} service isn't working",apiEmailUrl);
             throw new RuntimeException(e);
         }
     }
 
     public HttpResponse<String> fallbackCliente(SendEmail sendEmail, Producer producer, Throwable t){
-
-        LOGGER.error("CIRCUIT BREAKER CALLED FALLBACK METHOD. Throwable: {}",t.getMessage());
-        // TODO Retorne uma mensagem pro usuario falando que não foi possivel enviar o e-mail de validação de conta. aguarde
-        // TODO Registrar falha
+        // TODO Test if sending email fail, sending message to queue and while API-EMAIL to return should send email to client
+        LOGGER.info("[FLOW-NEW-USER] Circuit break method called because {} ",t.getMessage());
         producer.sendEmailValidFail(new SendEmailQueue(sendEmail.to(), sendEmail.typeEmail()));
         return null;
     }

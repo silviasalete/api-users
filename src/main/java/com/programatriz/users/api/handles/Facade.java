@@ -25,15 +25,15 @@ public class Facade {
     public User crateUser(){
 
         var context = new Context(dto, UserBuilder.builder().email(dto.email()).name(dto.name()).build());
-        var userAlreadyExist = new UserAlreadyExist(service);
-        userAlreadyExist
-                .setNext(new RoleIsValid())
+        var roleIsValid = new RoleIsValid();
+        roleIsValid
                 .setNext(new SetUserRole())
                 .setNext(new CriptPassword())
+                .setNext(new UserAlreadyExist(service))
                 .setNext(new CreateUser(service))
-//                .setNext(new SendToQueue(producer)) TODO Só depois que ele estiver com a conta ativa
+//                .setNext(new SendToQueue(producer)) TODO Only after count is active
                 .setNext(new SendEmailValidation(httpService, producer));
 
-        return userAlreadyExist.treat(context);
+        return roleIsValid.treat(context);
     }
 }

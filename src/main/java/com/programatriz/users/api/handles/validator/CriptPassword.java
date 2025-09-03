@@ -6,10 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+
 public class CriptPassword extends Validator{
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CriptPassword.class);
     @Override
     public User treat(Context context) {
+        LOGGER.info("[FLOW-NEW-USER] Encrypting password ...");
         String encryptedPassword = new BCryptPasswordEncoder().encode(context.getDto().password());
         context.getUser().setPassword(encryptedPassword);
         return super.treat(context);

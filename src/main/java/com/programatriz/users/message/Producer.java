@@ -1,16 +1,17 @@
 package com.programatriz.users.message;
 
 import com.programatriz.users.model.SendEmailQueue;
-import com.programatriz.users.model.User;
-import com.programatriz.users.model.UserDto;
 import com.programatriz.users.model.UserQueue;
-import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+
 @Component
 public class Producer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Producer.class);
 
     private final RabbitTemplate template;
 
@@ -27,12 +28,14 @@ public class Producer {
     @Value("${rabbitmq.routingkey.email}")
     private String emailRoutingkeyValidFail;
 
-
     public void sendUser(UserQueue userQueue){
         template.convertAndSend(userExchangeFanout, userQueue);
     }
 
     public void sendEmailValidFail(SendEmailQueue sendEmailQueue) {
+        LOGGER.info("[FLOW-NEW-USER] Sending message {}",sendEmailQueue.getTypeEmail());
+        LOGGER.info("[FLOW-NEW-USER] Exchange: {} | Routing key: {}",emailExchangeDirect, emailRoutingkeyValidFail);
+
         template.convertAndSend(emailExchangeDirect,emailRoutingkeyValidFail, sendEmailQueue);
     }
 }

@@ -7,4 +7,6 @@ public interface UserService {
      User create(User user);
      Iterable<User> listAll();
      User findByEmail(String email);
+     User findByEmailCacheable(String email);
+
 }

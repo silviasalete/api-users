@@ -2,7 +2,7 @@ application:
   title: Api USer
   version: 0.0.1
 server:
-  port: 8082
+  port: 8089
 spring:
   application:
     name: API USER
@@ -41,10 +41,10 @@ rabbitmq:
       new: new.users
 logging:
   level:
-    root: WARN
+    root: INFO
 api:
   email:
-    url: http://localhost:8081/email
+    url: ${API_EMAIL_URL}
 resilience4j:
   circuitbreaker:
     instances:
